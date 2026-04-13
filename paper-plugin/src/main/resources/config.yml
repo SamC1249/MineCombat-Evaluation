@@ -1,0 +1,37 @@
+# TCP control plane (localhost only by default)
+network:
+  bind: "127.0.0.1"
+  port: 8765
+
+evaluation:
+  # If empty, the first online player is used (sorted by name).
+  # Otherwise set to your exact Minecraft username (not UUID). See README.md.
+  player-name: ""
+  world: "world"
+  max-ticks: 2400
+  arena:
+    # Mob-clearing box around the fight (center + half-size). Match your ground level.
+    center-x: -39.0
+    center-y: 69.0
+    center-z: 12.0
+    half-size: 16
+    min-y-delta: 2
+    max-y-delta: 8
+  spawn:
+    player:
+      x: -39.0
+      y: 69.0
+      z: 12.0
+      yaw: 0.0
+      pitch: 0.0
+    # A few blocks away so the zombie does not overlap the player on reset.
+    zombie:
+      x: -31.0
+      y: 69.0
+      z: 12.0
+  gear:
+    weapon: "WOODEN_SWORD"
+
+  move:
+    base-speed: 0.22
+    sprint-multiplier: 1.3

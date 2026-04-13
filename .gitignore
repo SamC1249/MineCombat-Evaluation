@@ -1,0 +1,28 @@
+# Gradle
+paper-plugin/.gradle/
+paper-plugin/build/
+paper-plugin/out/
+
+# IDE
+.idea/
+*.iml
+.vscode/
+
+# OS
+.DS_Store
+
+# Local env (machine-specific JAVA_HOME, etc.)
+.env
+.env.local
+.env.*.local
+
+# Gradle machine-specific (optional)
+paper-plugin/local.properties
+
+# JVM diagnostics / dumps
+hs_err_pid*.log
+replay_pid*.log
+*.hprof
+
+# Stray logs
+*.log

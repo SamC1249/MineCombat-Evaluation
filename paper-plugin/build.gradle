@@ -1,0 +1,45 @@
+plugins {
+    id "java"
+}
+
+group = "com.minecombatevaluation"
+version = "0.1.0-SNAPSHOT"
+
+repositories {
+    maven {
+        name = "papermc"
+        url = "https://repo.papermc.io/repository/maven-public/"
+    }
+    mavenCentral()
+}
+
+dependencies {
+    compileOnly "io.papermc.paper:paper-api:${property('paperApiVersion')}"
+    implementation "com.google.code.gson:gson:2.12.1"
+}
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(25)
+    }
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.encoding = "UTF-8"
+    options.release = 25
+}
+
+processResources {
+    filteringCharset = "UTF-8"
+    filesMatching("plugin.yml") {
+        expand(version: project.version)
+    }
+}
+
+jar {
+    archiveBaseName = rootProject.name
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+    from {
+        configurations.runtimeClasspath.collect { f -> f.directory ? f : zipTree(f) }
+    }
+}

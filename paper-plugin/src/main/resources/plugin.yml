@@ -1,0 +1,6 @@
+name: MineCombat-Evaluation
+version: ${version}
+main: com.minecombatevaluation.MineCombatEvaluationPlugin
+api-version: '26.1.2'
+description: Combat-survival evaluation backend for embodied agents (MVP0 scaffold).
+author: MineCombat-Evaluation
