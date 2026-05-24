@@ -1,0 +1,184 @@
+{
+  "suite_id": "l2-cave-v1",
+  "suite_version": "1",
+  "description": "Level 2 cave environment \u2014 17 scenarios (13 mobs + 4 gear/time).",
+  "default_scenario_id": "CaveRoom-v0",
+  "episodes_per_task": 1,
+  "seed_base": 0,
+  "tasks": [
+    {
+      "task_id": "v0",
+      "scenario_id": "CaveRoom-v0",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "v0_creeper",
+      "scenario_id": "CaveRoom-v0-creeper",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "v0_skeleton",
+      "scenario_id": "CaveRoom-v0-skeleton",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "v0_enderman",
+      "scenario_id": "CaveRoom-v0-enderman",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "v0_spider",
+      "scenario_id": "CaveRoom-v0-spider",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "v0_baby_zombie",
+      "scenario_id": "CaveRoom-v0-baby-zombie",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "v0_witch",
+      "scenario_id": "CaveRoom-v0-witch",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "v0_magma_cube",
+      "scenario_id": "CaveRoom-v0-magma-cube",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "v0_slime",
+      "scenario_id": "CaveRoom-v0-slime",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "v0_hoglin",
+      "scenario_id": "CaveRoom-v0-hoglin",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "v0_silverfish",
+      "scenario_id": "CaveRoom-v0-silverfish",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "v0_blaze",
+      "scenario_id": "CaveRoom-v0-blaze",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "v0_shulker",
+      "scenario_id": "CaveRoom-v0-shulker",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "l1_wood_night",
+      "scenario_id": "CaveRoom-L1-wood-night",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "gear",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "l1_stone_day",
+      "scenario_id": "CaveRoom-L1-stone-day",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "gear",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "l1_iron_leather_day",
+      "scenario_id": "CaveRoom-L1-iron-leather-day",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "gear",
+        "cave"
+      ]
+    },
+    {
+      "task_id": "l1_iron_full_day",
+      "scenario_id": "CaveRoom-L1-iron-full-day",
+      "skill_family": "l2_combat",
+      "tags": [
+        "core",
+        "l2",
+        "gear",
+        "cave"
+      ]
+    }
+  ]
+}

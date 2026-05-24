@@ -3,20 +3,35 @@ package com.minecombatevaluation.game;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
+import com.google.gson.JsonElement;
+import com.minecombatevaluation.config.HostileSpawnSpec;
 import com.minecombatevaluation.config.PluginSettings;
+import com.minecombatevaluation.config.ScenarioSpec;
+import com.minecombatevaluation.config.SpawnLayout;
+import com.minecombatevaluation.config.TaskSpecMerger;
 import java.util.Comparator;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.UUID;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.World;
 import org.bukkit.attribute.Attribute;
+import org.bukkit.entity.ArmorStand;
+import org.bukkit.entity.Enderman;
 import org.bukkit.entity.Entity;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.Hoglin;
 import org.bukkit.entity.LivingEntity;
 import org.bukkit.entity.Monster;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.Shulker;
+import org.bukkit.entity.Slime;
 import org.bukkit.entity.Zombie;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.Material;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.BoundingBox;
 import org.bukkit.util.Vector;
@@ -24,6 +39,7 @@ import org.jetbrains.annotations.Nullable;
 
 public final class EvaluationEngine {
 
+    /** Backward-compatible default id (Level 1 wood / day). */
     public static final String SCENARIO_ZOMBIE_ROOM_V0 = "ZombieRoom-v0";
 
     private final JavaPlugin plugin;
@@ -37,6 +53,39 @@ public final class EvaluationEngine {
 
     public void reloadSettings() {
         this.settings = PluginSettings.from(plugin);
+        applyWorldIsolationIfReady();
+    }
+
+    public PluginSettings settings() {
+        return settings;
+    }
+
+    /** Re-applies isolation rules when the evaluation world is loaded (gamerule + border). */
+    public void applyWorldIsolationIfReady() {
+        World w = Bukkit.getWorld(settings.worldName);
+        if (w != null) {
+            settings.applyIsolation(w);
+        }
+    }
+
+    /**
+     * Called when a player quits: logs if that player was the evaluation subject (episode cleared so
+     * a new {@code reset} is required after rejoin).
+     */
+    public void onEvaluationPlayerQuit(UUID playerId) {
+        Episode ep = this.episode;
+        if (ep == null || ep.ended) {
+            return;
+        }
+        if (!Objects.equals(ep.player.getUniqueId(), playerId)) {
+            return;
+        }
+        ep.ended = true;
+        this.episode = null;
+        plugin.getLogger()
+                .severe(
+                        "[MineCombat-Evaluation] evaluation player left the game during an active episode; "
+                                + "rejoin the server, then run_eval / reset can start a new episode.");
     }
 
     public void onEntityDeath(Entity entity) {
@@ -47,8 +96,8 @@ public final class EvaluationEngine {
         if (entity instanceof Player p && p.getUniqueId().equals(ep.player.getUniqueId())) {
             ep.playerDead = true;
         }
-        if (ep.zombieId != null && entity.getUniqueId().equals(ep.zombieId)) {
-            ep.zombieDead = true;
+        if (ep.hostileIds.remove(entity.getUniqueId()) && ep.hostileIds.isEmpty()) {
+            ep.hostileDead = true;
         }
     }
 
@@ -74,10 +123,36 @@ public final class EvaluationEngine {
         if (!in.has("protocol") || in.get("protocol").getAsInt() != 1) {
             return error("unsupported protocol (expected 1)");
         }
-        String scenario = in.has("scenario_id") ? in.get("scenario_id").getAsString() : "";
-        if (!SCENARIO_ZOMBIE_ROOM_V0.equals(scenario)) {
-            return error("unsupported scenario_id: " + scenario);
+        String scenarioId = in.has("scenario_id") ? in.get("scenario_id").getAsString() : "";
+        ScenarioSpec base = settings.scenarios.get(scenarioId);
+        if (base == null) {
+            return error("unsupported scenario_id: " + scenarioId);
         }
+        if (base.level < 1 || base.level > 2) {
+            return error("unsupported scenario level: " + base.level);
+        }
+        com.google.gson.JsonObject taskJson = null;
+        if (in.has("task_spec") && !in.get("task_spec").isJsonNull()) {
+            JsonElement te = in.get("task_spec");
+            if (!te.isJsonObject()) {
+                return error("task_spec must be a JSON object");
+            }
+            taskJson = te.getAsJsonObject();
+        } else if (in.has("task") && !in.get("task").isJsonNull()) {
+            JsonElement te = in.get("task");
+            if (!te.isJsonObject()) {
+                return error("task must be a JSON object");
+            }
+            taskJson = te.getAsJsonObject();
+        }
+        TaskSpecMerger.Result merged = new TaskSpecMerger.Result();
+        String mergeErr = TaskSpecMerger.merge(base, taskJson, settings.taskSpecLimits, merged);
+        if (mergeErr != null) {
+            return error(mergeErr);
+        }
+        ScenarioSpec spec = merged.spec;
+        boolean taskSpecApplied = merged.taskSpecApplied;
+        SpawnLayout layout = settings.layoutFor(spec);
         Player player = settings.resolvePlayer();
         if (player == null || !player.isOnline()) {
             return error("no online player (join the server or set evaluation.player-name)");
@@ -86,19 +161,16 @@ public final class EvaluationEngine {
         if (world == null) {
             return error("world not found: " + settings.worldName);
         }
-        episode = Episode.begin(player);
-        clearHostiles(world);
-        Location ps = settings.playerSpawn(world);
+        settings.applyIsolation(world, layout);
+        episode = Episode.begin(player, spec, layout, taskSpecApplied);
+        clearHostiles(world, layout);
+        world.setTime(spec.worldTime);
+        Location ps = settings.playerSpawn(world, layout);
         player.teleport(ps);
-        player.getInventory().clear();
-        player.getInventory().setItemInMainHand(new ItemStack(settings.weapon));
+        applyGear(player, spec);
         player.setHealth(player.getAttribute(Attribute.MAX_HEALTH).getValue());
         player.setFoodLevel(20);
-        Location zs = settings.zombieSpawn(world);
-        Zombie z = world.spawn(zs, Zombie.class);
-        z.setRemoveWhenFarAway(false);
-        z.setPersistent(true);
-        episode.zombieId = z.getUniqueId();
+        spawnHostiles(world, layout, spec, episode);
         episode.tick = 0;
         JsonObject obs = buildObservation(episode, world);
         JsonObject out = new JsonObject();
@@ -110,6 +182,22 @@ public final class EvaluationEngine {
         out.addProperty("truncated", false);
         out.addProperty("terminated", false);
         return out.toString();
+    }
+
+    private static void applyGear(Player player, ScenarioSpec spec) {
+        player.getInventory().clear();
+        player.getInventory().setItemInMainHand(new ItemStack(spec.weapon));
+        player.getInventory().setHelmet(stackOrNull(spec.helmet));
+        player.getInventory().setChestplate(stackOrNull(spec.chestplate));
+        player.getInventory().setLeggings(stackOrNull(spec.leggings));
+        player.getInventory().setBoots(stackOrNull(spec.boots));
+    }
+
+    private static ItemStack stackOrNull(Material m) {
+        if (m == null || m == Material.AIR) {
+            return null;
+        }
+        return new ItemStack(m);
     }
 
     private String onStep(JsonObject in) {
@@ -132,6 +220,9 @@ public final class EvaluationEngine {
         if (!ep.id.equals(id)) {
             return error("episode_id mismatch");
         }
+        if (!ep.player.isOnline()) {
+            return abortEpisodePlayerDisconnected("step: evaluation player is offline");
+        }
         World world = ep.player.getWorld();
         ep.tick += 1;
         JsonObject action = in.has("action") ? in.getAsJsonObject("action") : new JsonObject();
@@ -145,12 +236,12 @@ public final class EvaluationEngine {
             outcome = "failure";
             reason = "player_died";
             ep.ended = true;
-        } else if (ep.zombieDead) {
+        } else if (ep.hostileDead) {
             terminated = true;
             outcome = "success";
             reason = "all_hostiles_defeated";
             ep.ended = true;
-        } else if (ep.tick >= settings.maxTicks) {
+        } else if (ep.tick >= ep.scenario.maxTicks) {
             terminated = true;
             outcome = "timeout";
             reason = "max_ticks";
@@ -174,18 +265,99 @@ public final class EvaluationEngine {
         return out.toString();
     }
 
-    private void clearHostiles(World world) {
-        Location c = settings.arenaCenter(world);
-        double hs = settings.halfSize;
-        double yMin = c.getY() - settings.minYDelta;
-        double yMax = c.getY() + settings.maxYDelta;
+    private String abortEpisodePlayerDisconnected(String context) {
+        Episode ep = this.episode;
+        if (ep != null) {
+            ep.ended = true;
+        }
+        this.episode = null;
+        plugin.getLogger()
+                .severe("[MineCombat-Evaluation] " + context + " — evaluation aborted; rejoin, then send reset.");
+        return error("player disconnected");
+    }
+
+    private void clearHostiles(World world, SpawnLayout layout) {
+        Location c = layout.arenaCenter(world);
+        double hs = layout.mobClearHalfSize;
+        double yMin = c.getY() - layout.minYDelta;
+        double yMax = c.getY() + layout.maxYDelta;
         BoundingBox bb =
                 BoundingBox.of(
                         new Vector(c.getX() - hs, yMin, c.getZ() - hs),
                         new Vector(c.getX() + hs, yMax, c.getZ() + hs));
-        for (Entity e : world.getNearbyEntities(bb, e -> e instanceof Monster)) {
+        for (Entity e : world.getNearbyEntities(bb, EvaluationEngine::isArenaHostile)) {
             e.remove();
         }
+    }
+
+    /**
+     * Level 1 arena uses {@link Monster} plus mobs that are hostile but do not implement {@link
+     * Monster} (e.g. enderman, slimes, shulker).
+     */
+    private static boolean isArenaHostile(Entity e) {
+        if (e instanceof Player || e instanceof ArmorStand) {
+            return false;
+        }
+        if (e instanceof Monster) {
+            return true;
+        }
+        if (e instanceof Enderman) {
+            return true;
+        }
+        if (e instanceof Slime) {
+            return true;
+        }
+        if (e instanceof Shulker) {
+            return true;
+        }
+        return false;
+    }
+
+    private static void spawnHostiles(
+            World world, SpawnLayout layout, ScenarioSpec spec, Episode episode) {
+        List<HostileSpawnSpec> plans = spec.resolvedHostiles(layout);
+        int spreadIndex = 0;
+        for (HostileSpawnSpec plan : plans) {
+            double bx = plan.hasPosition() ? plan.x : layout.hostileAnchorX;
+            double by = plan.hasPosition() ? plan.y : layout.hostileAnchorY;
+            double bz = plan.hasPosition() ? plan.z : layout.hostileAnchorZ;
+            for (int i = 0; i < plan.count; i++) {
+                double[] off = spreadOffset(spreadIndex, plan.count);
+                Location loc = new Location(world, bx + off[0], by, bz + off[1]);
+                Entity hostile = spawnHostile(world, loc, plan.entity, plan.baby);
+                episode.hostileIds.add(hostile.getUniqueId());
+                spreadIndex++;
+            }
+        }
+    }
+
+    /** Small horizontal offsets so multiple mobs do not overlap. */
+    private static double[] spreadOffset(int index, int groupSize) {
+        if (groupSize <= 1) {
+            return new double[] {0.0, 0.0};
+        }
+        double angle = (2.0 * Math.PI * index) / groupSize;
+        double r = 1.5 + (index % 2) * 0.5;
+        return new double[] {Math.cos(angle) * r, Math.sin(angle) * r};
+    }
+
+    private static Entity spawnHostile(World world, Location loc, EntityType type, boolean baby) {
+        EntityType t = type != null ? type : EntityType.ZOMBIE;
+        Entity e = world.spawnEntity(loc, t);
+        if (e instanceof Zombie z) {
+            z.setBaby(baby);
+        }
+        if (e instanceof Hoglin h) {
+            h.setImmuneToZombification(true);
+        }
+        if (e instanceof Slime s) {
+            s.setSize(1);
+        }
+        if (e instanceof LivingEntity le) {
+            le.setRemoveWhenFarAway(false);
+            le.setPersistent(true);
+        }
+        return e;
     }
 
     private void applyAction(Player player, JsonObject a) {
@@ -245,7 +417,7 @@ public final class EvaluationEngine {
             if (target.equals(player)) {
                 continue;
             }
-            if (!(target instanceof Monster)) {
+            if (!isArenaHostile(target)) {
                 continue;
             }
             if (!player.hasLineOfSight(target)) {
@@ -272,6 +444,8 @@ public final class EvaluationEngine {
 
     private JsonObject buildObservation(Episode ep, World world) {
         Player p = ep.player;
+        ScenarioSpec sc = ep.scenario;
+        boolean taskSpecApplied = ep.taskSpecApplied;
         JsonObject obs = new JsonObject();
         obs.addProperty("tick", ep.tick);
         JsonObject pj = new JsonObject();
@@ -292,12 +466,12 @@ public final class EvaluationEngine {
         obs.add("player", pj);
 
         JsonArray mobs = new JsonArray();
-        Location center = settings.arenaCenter(world);
+        Location center = ep.layout.arenaCenter(world);
         for (Entity e : world.getNearbyEntities(center, 48.0, 48.0, 48.0)) {
-            if (!(e instanceof Monster)) {
+            if (!(e instanceof LivingEntity le)) {
                 continue;
             }
-            if (!(e instanceof LivingEntity le)) {
+            if (!isArenaHostile(le)) {
                 continue;
             }
             Location el = le.getLocation();
@@ -316,6 +490,22 @@ public final class EvaluationEngine {
         JsonObject meta = new JsonObject();
         meta.addProperty("plugin_version", plugin.getPluginMeta().getVersion());
         meta.addProperty("paper_minecraft", Bukkit.getVersion());
+        meta.addProperty("scenario_id", sc.id);
+        meta.addProperty("scenario_version", sc.scenarioVersion);
+        meta.addProperty("scenario_level", sc.level);
+        meta.addProperty("time_of_day", sc.timeOfDayLabel);
+        meta.addProperty("world_time", sc.worldTime);
+        meta.addProperty("hostile_entity", sc.hostileEntity.name());
+        meta.addProperty("hostile_count", ep.hostileIds.size());
+        if (sc.environmentId != null && !sc.environmentId.isBlank()) {
+            meta.addProperty("environment_id", sc.environmentId);
+        }
+        if (sc.babyZombie) {
+            meta.addProperty("baby_zombie", true);
+        }
+        if (taskSpecApplied) {
+            meta.addProperty("task_spec_applied", true);
+        }
         obs.add("meta", meta);
         return obs;
     }
@@ -358,17 +548,24 @@ public final class EvaluationEngine {
         final UUID id = UUID.randomUUID();
         int tick;
         final Player player;
-        @Nullable UUID zombieId;
-        volatile boolean zombieDead;
+        final ScenarioSpec scenario;
+        final SpawnLayout layout;
+        final boolean taskSpecApplied;
+        final Set<UUID> hostileIds = new HashSet<>();
+        volatile boolean hostileDead;
         volatile boolean playerDead;
         boolean ended;
 
-        private Episode(Player player) {
+        private Episode(Player player, ScenarioSpec scenario, SpawnLayout layout, boolean taskSpecApplied) {
             this.player = player;
+            this.scenario = scenario;
+            this.layout = layout;
+            this.taskSpecApplied = taskSpecApplied;
         }
 
-        static Episode begin(Player player) {
-            return new Episode(player);
+        static Episode begin(
+                Player player, ScenarioSpec scenario, SpawnLayout layout, boolean taskSpecApplied) {
+            return new Episode(player, scenario, layout, taskSpecApplied);
         }
     }
 }

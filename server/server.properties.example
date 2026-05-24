@@ -1,0 +1,11 @@
+# Snippet for MineCombat-Evaluation: superflat world with a dedicated level name.
+# Merge these into your Paper server’s server.properties (next to paper.jar), then:
+# - Stop the server
+# - Remove or rename the old world folder if you already had level-name=world
+# - Start again so Paper generates ./mcbench_flat/ (or your chosen name) as flat
+#
+# If a world folder already exists for this level-name, generation type is taken from
+# that world’s level.dat — use a new level-name or delete the folder for flat to apply.
+
+level-name=mcbench_flat
+level-type=minecraft:flat

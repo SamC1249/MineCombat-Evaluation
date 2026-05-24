@@ -1,0 +1,7 @@
+{
+  "entities": [
+    { "entity": "ZOMBIE", "count": 2 },
+    { "entity": "SKELETON", "count": 1 }
+  ],
+  "max_ticks": 2400
+}

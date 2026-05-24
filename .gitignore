@@ -1,23 +1,26 @@
-# Gradle
+# Gradle / Java
 paper-plugin/.gradle/
 paper-plugin/build/
 paper-plugin/out/
+paper-plugin/local.properties
+*.class
 
 # IDE
 .idea/
 *.iml
 .vscode/
+*.swp
+*.swo
+*~
 
 # OS
 .DS_Store
+Thumbs.db
 
-# Local env (machine-specific JAVA_HOME, etc.)
+# Local env (machine-specific JAVA_HOME, SERVER paths, etc.)
 .env
 .env.local
 .env.*.local
-
-# Gradle machine-specific (optional)
-paper-plugin/local.properties
 
 # JVM diagnostics / dumps
 hs_err_pid*.log
@@ -26,3 +29,32 @@ replay_pid*.log
 
 # Stray logs
 *.log
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+.venv/
+venv/
+env/
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Eval run outputs (local experiment logs)
+episodes.jsonl
+results/
+*.jsonl.bak
+
+# Local Paper server / world (if kept inside or next to repo)
+server/world/
+server/logs/
+server/plugins/*.jar
+server/plugins/MineCombat-Evaluation/config.yml
+
+# Cursor / editor local state (optional)
+.cursor/

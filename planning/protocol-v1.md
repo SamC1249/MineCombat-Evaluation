@@ -128,9 +128,16 @@ When the episode ends, **`terminated` is true** and `outcome` / `reason` are set
   ],
   "meta": {
     "plugin_version": "0.1.0-SNAPSHOT",
-    "paper_minecraft": "26.1.x (runtime)"
+    "paper_minecraft": "26.1.x (runtime)",
+    "scenario_id": "ZombieRoom-v0",
+    "scenario_version": "1",
+    "scenario_level": 1,
+    "time_of_day": "day",
+    "world_time": 1000
   }
 }
 ```
 
-`meta.paper_minecraft` is best-effort from the running server.
+- `meta.paper_minecraft` is best-effort from the running server.
+- `scenario_id` / `scenario_version` / `scenario_level` identify the active **Level 1** scenario (same superflat arena; gear and time-of-day from server config). **Level 2** (custom environments) is not implemented until bespoke maps exist.
+- `time_of_day` is a short label (`day`, `night`, `custom`, …); `world_time` is the overworld time tick (0–24000) set on `reset`.
