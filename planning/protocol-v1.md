@@ -139,5 +139,6 @@ When the episode ends, **`terminated` is true** and `outcome` / `reason` are set
 ```
 
 - `meta.paper_minecraft` is best-effort from the running server.
-- `scenario_id` / `scenario_version` / `scenario_level` identify the active **Level 1** scenario (same superflat arena; gear and time-of-day from server config). **Level 2** (custom environments) is not implemented until bespoke maps exist.
+- `scenario_id` / `scenario_version` / `scenario_level` identify the active scenario. **Level 1** uses the template superflat arena; **Level 2** uses custom environments (`environment_id`: `cave`, `beach`) at fixed coordinates — see `planning/world-setup.md`.
 - `time_of_day` is a short label (`day`, `night`, `custom`, …); `world_time` is the overworld time tick (0–24000) set on `reset`.
+- Full field reference and stability contract: **`planning/observation-v1.md`**.

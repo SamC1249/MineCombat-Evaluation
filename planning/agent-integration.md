@@ -18,18 +18,30 @@ Or provide a plain **callable** `(observation, tick) -> Action` (same as `AgentF
 ### `run_eval.py`
 
 ```bash
-python3 run_eval.py --policy minecombat_eval.reference_policy:NoopPolicy --scenario ZombieRoom-L1-iron-full-day
+python3 run_eval.py --policy minecombat_eval.reference_policy:ReferenceCombatPolicy --scenario ZombieRoom-v0
+python3 run_suite.py --suite benchmarks/l1-v1/suite.json \
+  --policy minecombat_eval.reference_policy:ReferenceCombatPolicy -o results/l1-v1-ref.jsonl
 ```
 
 `--policy module:Name` loads a **Policy subclass** (instantiated automatically) or a callable.
 
 Stub agents: `--agent noop|random` when `--policy` is omitted.
 
+### Official baseline: `ReferenceCombatPolicy`
+
+Heuristic combat agent (no ML): targets nearest hostile in `observation.mobs`, aims with clamped yaw/pitch deltas, closes distance, attacks in range. Use for paper comparisons — see `planning/benchmark-suites.md`.
+
+```bash
+python3 run_eval.py --policy minecombat_eval.reference_policy:ReferenceCombatPolicy --episodes 5 --seed-base 0
+```
+
+Example noop policy: `minecombat_eval.reference_policy:NoopPolicy`.
+
 ## Level 1 scenarios
 
 All use the **same** arena and spawns from server `config.yml`; only **gear**, **time-of-day**, and optional **max-ticks** change. See `evaluation.scenarios` in the plugin config.
 
-**Level 2** (custom-built maps) is reserved — not wired in the plugin yet.
+**Level 2** (`CaveRoom-*`, `BeachRoom-*`) uses fixed environments in `evaluation.environments` — see `planning/world-setup.md`.
 
 ## Reward (current)
 
@@ -37,4 +49,4 @@ The server sends **`reward: 0.0`** on each `step_result`. Treat **terminal** `ou
 
 ## Observation
 
-See `planning/protocol-v1.md`. Check `observation.meta` for `scenario_id`, `scenario_version`, `scenario_level`, `time_of_day`, `world_time`.
+Full schema: **`planning/observation-v1.md`**. Wire format: `planning/protocol-v1.md`. Check `observation.meta` for `scenario_id`, `scenario_version`, `scenario_level`, `time_of_day`, `world_time`, and L2 `environment_id`.

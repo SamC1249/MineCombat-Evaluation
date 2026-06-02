@@ -74,6 +74,36 @@ Scope and rationale: **`planning/mvp1.md`**. Builds on MVP0: **benchmark-first**
 
 ---
 
+## Research-ready (post MVP 1.0)
+
+Full plan: **`planning/research-ready-plan.md`**. Tier 1 = external researchers can run cited suites; Tier 2 = paper tables + obs schema + benchmark cards.
+
+### Tier 1
+- [x] `planning/run-benchmark.md` — one-page install → suite run
+- [x] `planning/benchmark-suites.md` — cite L1-v1 / L2-cave-v1 / L2-beach-v1 + seeds
+- [x] `planning/world-setup.md` — `mcbench_flat`, L2 built geometry
+- [x] `scripts/sync-config.sh`
+- [x] `ReferenceCombatPolicy` in `reference_policy.py`
+- [x] README pin Paper/MC + link run-benchmark
+
+### Tier 2
+- [x] `planning/observation-v1.md`
+- [x] `planning/benchmark-cards.md`
+- [x] `scripts/summarize_results.py`
+
+### Tier 3 (backlog)
+- [ ] Config reload without restart
+- [ ] Human / keyboard baseline
+- [ ] Reward shaping in protocol
+- [ ] Parallel envs
+- [x] pip package (`pyproject.toml`, `minecombat-eval` CLI)
+- [x] Ship world artifact (`mcbench_flat-v1.zip` + manifest SHA256)
+- [x] Docker (`docker compose up`)
+- [x] Release workflow (PyPI + GitHub assets)
+- [ ] Rich observations
+
+---
+
 ## Backbone setup (reference)
 
 Use this to align repo layout and local dev before building scenario logic.
