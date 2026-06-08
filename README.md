@@ -1,6 +1,12 @@
 # MineCombat-Evaluation
 
+<p align="center">
+  <img src="assets/minecombat-banner-hero.png" alt="MineCombat-Evaluation banner" width="100%">
+</p>
+
 Paper plugin + TCP JSON protocol for combat-survival benchmarks on Minecraft **26.1** (Paper **26.1.2**, plugin **0.1.0-SNAPSHOT**, protocol **1**).
+
+**White paper:** [MineCombat-Evaluation: A Reproducible Minecraft Combat Benchmark for Agent Evaluation](paper/whitepaper.md)
 
 ## Quick start
 
@@ -16,6 +22,22 @@ minecombat-eval run-suite l1-v1 -o results/l1-v1-ref.jsonl
 **Docker:** `docker compose up --build` → join `:25565` → `minecombat-eval run-suite l1-v1 --port 8765`
 
 Full path: **[planning/run-benchmark.md](planning/run-benchmark.md)** · World artifact: **[artifacts/README.md](artifacts/README.md)**
+
+---
+
+## System Overview
+
+![MineCombat-Evaluation system architecture](assets/system-architecture.svg)
+
+## Benchmark Suites
+
+![MineCombat-Evaluation benchmark suites](assets/benchmark-suites.svg)
+
+| Suite | Tasks | Purpose |
+|-------|------:|---------|
+| `l1-v1` | 36 | Controlled mob × gear × day/night grid |
+| `l2-cave-v1` | 17 | Enclosed cave combat environment |
+| `l2-beach-v1` | 17 | Open beach combat environment |
 
 ---
 
@@ -41,7 +63,9 @@ Tagging `v*` now triggers `.github/workflows/release.yml`, which:
 ## Brand Assets
 
 - Prompt pack for polished banners/icon: `assets/branding-prompts.md`
-- Generated files should live under `assets/` (e.g. `minecombat-banner-hero.png`, `minecombat-icon.png`)
+- Generated hero banner: `assets/minecombat-banner-hero.png`
+- Generated technical banner: `assets/minecombat-banner-tech.png`
+- Generated icon: `assets/minecombat-icon.png`
 
 ---
 

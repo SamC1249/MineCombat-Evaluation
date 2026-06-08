@@ -1,0 +1,64 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1400" height="620" viewBox="0 0 1400 620" role="img" aria-labelledby="title desc">
+  <title id="title">MineCombat-Evaluation Benchmark Suites</title>
+  <desc id="desc">Overview of l1-v1, l2-cave-v1, and l2-beach-v1 benchmark suites.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0%" stop-color="#07111f"/>
+      <stop offset="100%" stop-color="#0b1a12"/>
+    </linearGradient>
+    <linearGradient id="blue" x1="0" x2="1">
+      <stop offset="0%" stop-color="#0ea5e9"/>
+      <stop offset="100%" stop-color="#2563eb"/>
+    </linearGradient>
+    <linearGradient id="green" x1="0" x2="1">
+      <stop offset="0%" stop-color="#22c55e"/>
+      <stop offset="100%" stop-color="#0f766e"/>
+    </linearGradient>
+    <linearGradient id="sand" x1="0" x2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#0ea5e9"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="12" flood-color="#000000" flood-opacity="0.35"/>
+    </filter>
+  </defs>
+  <rect width="1400" height="620" fill="url(#bg)"/>
+  <text x="70" y="72" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="38" font-weight="700">Official Benchmark Suites</text>
+  <text x="70" y="108" fill="#93c5fd" font-family="Inter, Arial, sans-serif" font-size="18">Citable suite ids, fixed manifests, seed protocol, and JSONL results</text>
+
+  <g filter="url(#shadow)">
+    <rect x="70" y="165" width="370" height="300" rx="24" fill="#0b1d32" stroke="#2563eb"/>
+    <rect x="70" y="165" width="370" height="82" rx="24" fill="url(#blue)" opacity="0.9"/>
+    <text x="105" y="216" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="800">L1-v1</text>
+    <text x="105" y="286" fill="#e0f2fe" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">Template arena</text>
+    <text x="105" y="326" fill="#bae6fd" font-family="Inter, Arial, sans-serif" font-size="17">36 tasks</text>
+    <text x="105" y="360" fill="#bae6fd" font-family="Inter, Arial, sans-serif" font-size="17">6 mobs × 3 gear tiers × day/night</text>
+    <text x="105" y="394" fill="#93c5fd" font-family="Inter, Arial, sans-serif" font-size="15">Goal: controlled melee/ranged baseline grid</text>
+    <rect x="105" y="420" width="120" height="26" rx="13" fill="#0f172a" stroke="#38bdf8"/>
+    <text x="128" y="439" fill="#7dd3fc" font-family="Inter, Arial, sans-serif" font-size="13">suite_id: l1-v1</text>
+
+    <rect x="515" y="165" width="370" height="300" rx="24" fill="#102317" stroke="#22c55e"/>
+    <rect x="515" y="165" width="370" height="82" rx="24" fill="url(#green)" opacity="0.9"/>
+    <text x="550" y="216" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="800">L2-cave-v1</text>
+    <text x="550" y="286" fill="#dcfce7" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">Underground environment</text>
+    <text x="550" y="326" fill="#bbf7d0" font-family="Inter, Arial, sans-serif" font-size="17">17 tasks</text>
+    <text x="550" y="360" fill="#bbf7d0" font-family="Inter, Arial, sans-serif" font-size="17">Enclosed terrain, low light, pressure mobs</text>
+    <text x="550" y="394" fill="#86efac" font-family="Inter, Arial, sans-serif" font-size="15">Goal: navigation + close-quarters combat</text>
+    <rect x="550" y="420" width="165" height="26" rx="13" fill="#052e16" stroke="#22c55e"/>
+    <text x="570" y="439" fill="#86efac" font-family="Inter, Arial, sans-serif" font-size="13">suite_id: l2-cave-v1</text>
+
+    <rect x="960" y="165" width="370" height="300" rx="24" fill="#21190a" stroke="#f59e0b"/>
+    <rect x="960" y="165" width="370" height="82" rx="24" fill="url(#sand)" opacity="0.9"/>
+    <text x="995" y="216" fill="#ffffff" font-family="Inter, Arial, sans-serif" font-size="30" font-weight="800">L2-beach-v1</text>
+    <text x="995" y="286" fill="#fef3c7" font-family="Inter, Arial, sans-serif" font-size="18" font-weight="700">Open terrain environment</text>
+    <text x="995" y="326" fill="#fde68a" font-family="Inter, Arial, sans-serif" font-size="17">17 tasks</text>
+    <text x="995" y="360" fill="#fde68a" font-family="Inter, Arial, sans-serif" font-size="17">Sight lines, ranged pressure, kiting</text>
+    <text x="995" y="394" fill="#fcd34d" font-family="Inter, Arial, sans-serif" font-size="15">Goal: surface combat + spacing control</text>
+    <rect x="995" y="420" width="175" height="26" rx="13" fill="#2b1700" stroke="#f59e0b"/>
+    <text x="1015" y="439" fill="#fde68a" font-family="Inter, Arial, sans-serif" font-size="13">suite_id: l2-beach-v1</text>
+  </g>
+
+  <rect x="70" y="505" width="1260" height="72" rx="18" fill="#061827" stroke="#1e40af"/>
+  <text x="105" y="550" fill="#f8fafc" font-family="Inter, Arial, sans-serif" font-size="19" font-weight="700">Reporting protocol:</text>
+  <text x="305" y="550" fill="#bae6fd" font-family="Inter, Arial, sans-serif" font-size="18">10 episodes/task · seed = seed_base + i · include ReferenceCombatPolicy · publish JSONL logs</text>
+</svg>
