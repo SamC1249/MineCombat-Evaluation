@@ -62,6 +62,13 @@ public final class PluginSettings {
      * {@code setTime} for night/day is not overridden by tick progression.
      */
     public final boolean freezeDaylightCycle;
+    /**
+     * When true, the eval world's blocks are immutable: player block break/place, bucket use,
+     * fire/liquid spread, decay, and non-entity explosions are cancelled via
+     * {@link com.minecombatevaluation.game.WorldImmutabilityListener}. Mob-caused block changes
+     * are handled separately by {@link #disableMobGriefing}.
+     */
+    public final boolean protectWorldBlocks;
     public final ScenarioRegistry scenarios;
     public final EnvironmentRegistry environments;
     public final TaskSpecLimits taskSpecLimits;
@@ -92,6 +99,7 @@ public final class PluginSettings {
             double worldBorderDiameter,
             boolean disableMobGriefing,
             boolean freezeDaylightCycle,
+            boolean protectWorldBlocks,
             ScenarioRegistry scenarios,
             EnvironmentRegistry environments,
             TaskSpecLimits taskSpecLimits) {
@@ -120,6 +128,7 @@ public final class PluginSettings {
         this.worldBorderDiameter = worldBorderDiameter;
         this.disableMobGriefing = disableMobGriefing;
         this.freezeDaylightCycle = freezeDaylightCycle;
+        this.protectWorldBlocks = protectWorldBlocks;
         this.scenarios = scenarios;
         this.environments = environments;
         this.taskSpecLimits = taskSpecLimits;
@@ -154,11 +163,13 @@ public final class PluginSettings {
         double wbd = 128.0;
         boolean dmg = true;
         boolean fdc = true;
+        boolean pwb = true;
         if (isolation != null) {
             dms = isolation.getBoolean("disable-natural-spawn", true);
             wbd = isolation.getDouble("world-border-diameter", 128.0);
             dmg = isolation.getBoolean("disable-mob-griefing", true);
             fdc = isolation.getBoolean("freeze-daylight-cycle", true);
+            pwb = isolation.getBoolean("protect-world-blocks", true);
         }
         ScenarioRegistry registry = ScenarioRegistry.from(plugin);
         EnvironmentRegistry environments = EnvironmentRegistry.from(plugin);
@@ -190,6 +201,7 @@ public final class PluginSettings {
                 wbd,
                 dmg,
                 fdc,
+                pwb,
                 registry,
                 environments,
                 taskLimits);

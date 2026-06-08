@@ -4,6 +4,7 @@ import com.minecombatevaluation.game.CombatListener;
 import com.minecombatevaluation.game.EnvironmentProtectionListener;
 import com.minecombatevaluation.game.EvaluationEngine;
 import com.minecombatevaluation.game.EvaluationQuitListener;
+import com.minecombatevaluation.game.WorldImmutabilityListener;
 import com.minecombatevaluation.net.EvaluationTcpServer;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -20,6 +21,7 @@ public final class MineCombatEvaluationPlugin extends JavaPlugin {
         engine = new EvaluationEngine(this);
         getServer().getPluginManager().registerEvents(new CombatListener(engine), this);
         getServer().getPluginManager().registerEvents(new EnvironmentProtectionListener(engine), this);
+        getServer().getPluginManager().registerEvents(new WorldImmutabilityListener(engine), this);
         getServer().getPluginManager().registerEvents(new EvaluationQuitListener(engine), this);
         tcp = new EvaluationTcpServer(this, engine);
         tcp.start();
