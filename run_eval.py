@@ -9,7 +9,6 @@ Run from repo root: python3 run_eval.py
 from __future__ import annotations
 
 import argparse
-import importlib
 import json
 import sys
 from pathlib import Path
@@ -17,8 +16,8 @@ from typing import Any, Callable, TextIO
 
 from minecombat_eval.agents import AgentFn, make_random_agent, noop_agent
 from minecombat_eval.connector import EvaluationConnector, EvaluationProtocolError
+from minecombat_eval.loader import load_policy_entry
 from minecombat_eval.models import EpisodeResult, PROTOCOL_VERSION
-from minecombat_eval.policy import Policy
 
 # Failsafe if server never terminates (should match server max-ticks order of magnitude).
 _MAX_STEPS = 200_000
@@ -55,33 +54,6 @@ def _meta_from_observation(
     except (TypeError, ValueError):
         sli = None
     return ver, pmc, svs, sli
-
-
-def load_policy_entry(spec: str) -> tuple[AgentFn, Callable[[dict[str, Any]], None] | None]:
-    """
-    Import module:attr — either a Policy subclass/instance or an AgentFn (obs, tick) -> Action.
-    """
-    mod_path, sep, name = spec.partition(":")
-    if not sep or not name:
-        raise ValueError("expected --policy module.path:ClassOrCallable")
-    mod = importlib.import_module(mod_path)
-    obj = getattr(mod, name)
-    if isinstance(obj, type):
-        if not issubclass(obj, Policy):
-            raise TypeError(f"{spec}: class must subclass minecombat_eval.policy.Policy")
-        obj = obj()
-    if isinstance(obj, Policy):
-
-        def agent_fn(obs: dict[str, Any] | None, tick: int) -> Any:
-            return obj.act(obs, tick)
-
-        def before(ctx: dict[str, Any]) -> None:
-            obj.reset(ctx)
-
-        return agent_fn, before
-    if callable(obj):
-        return obj, None
-    raise TypeError(f"{spec}: not a Policy subclass/instance or callable")
 
 
 def run_one_episode(

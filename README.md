@@ -105,4 +105,20 @@ Flags and scenario ids: **`planning/commands-and-scenarios.md`**. Custom policie
 
 Official baseline: **`ReferenceCombatPolicy`** (`minecombat_eval/reference_policy.py`).
 
+## Porting your own policy
+
+Full guide: **[docs/policy-porting.md](docs/policy-porting.md)**. The fast path:
+
+```bash
+minecombat-eval init-policy my_agent --kind conditional        # scaffold an editable package
+minecombat-eval test-policy my_agent.policy:MyAgentPolicy       # validate offline (no Minecraft)
+minecombat-eval run-suite l1-v1 --policy my_agent.policy:MyAgentPolicy -o results/l1.jsonl
+```
+
+`init-policy` supports `--kind scripted|conditional|torch`. `test-policy` runs
+your `act()` on synthetic observations and checks every `Action`, catching import
+errors, exceptions, and bad outputs before you start a server. Helpers
+(`nearest_mob`, `aim_at`, …) and runnable examples live in
+`minecombat_eval.helpers` and **[examples/custom_policy/](examples/custom_policy/)**.
+
 Eval logs (`episodes.jsonl`, `results/`) are gitignored.
