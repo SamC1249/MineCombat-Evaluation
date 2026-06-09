@@ -87,6 +87,10 @@ evaluation:
     freeze-daylight-cycle: true
     # If true, doMobGriefing = false plus event guards (creeper block damage, endermen, blaze fire, doors).
     disable-mob-griefing: true
+    # If true, the eval world's blocks are immutable: cancels player block break/place, bucket use,
+    # fire/liquid spread, decay, and non-entity (bed/anchor) explosions. Keeps the arena pristine
+    # across runs. Mob-caused block changes are covered by disable-mob-griefing above.
+    protect-world-blocks: true
 
   # Level 1: same superflat arena; vary gear, time-of-day, optional max-ticks.
   # `entity` = Bukkit EntityType (e.g. ZOMBIE, CREEPER). `baby: true` only for ZOMBIE.

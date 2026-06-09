@@ -1,5 +1,10 @@
 # Agent integration (benchmark-first)
 
+> **Porting a policy?** Start with **[`docs/policy-porting.md`](../docs/policy-porting.md)**:
+> `minecombat-eval init-policy` scaffolds a package, `minecombat-eval test-policy`
+> validates it offline (no server), and `minecombat_eval.helpers` removes the
+> targeting/aiming boilerplate. This page covers the underlying modes and contract.
+
 ## Modes
 
 1. **Eval over TCP (default)** — Your code maps `observation` → `Action` each tick. Train offline or elsewhere; no Gym dependency.

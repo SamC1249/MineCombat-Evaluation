@@ -16,6 +16,7 @@ Default plugin isolation (see repo `config.yml` → `evaluation.isolation`):
 - World border centered on the active arena (128-block diameter default)
 - Daylight cycle frozen during episodes
 - Mob griefing disabled (creeper block damage, etc.)
+- Blocks immutable (`protect-world-blocks`): player break/place, bucket use, fire/liquid spread, decay, and bed/anchor explosions are all cancelled in the eval world so the arena stays pristine across runs
 
 ## Level 1 — template arena (superflat)
 

@@ -6,9 +6,14 @@ import argparse
 import os
 import subprocess
 import sys
+import traceback
 from pathlib import Path
 
 from .bootstrap import BootstrapError, bootstrap, export_world, load_manifest, repo_root
+from .helpers import validate_action
+from .loader import load_policy_entry
+from .scaffold import KINDS, ScaffoldError, init_policy
+from .synthetic import approach_episode
 
 
 def _load_dotenv() -> None:
@@ -140,6 +145,69 @@ def cmd_server_start(args: argparse.Namespace) -> int:
     return subprocess.call([str(script)], cwd=root)
 
 
+def cmd_init_policy(args: argparse.Namespace) -> int:
+    directory = Path(args.dir).resolve() if args.dir else None
+    try:
+        pkg_dir, spec = init_policy(args.name, kind=args.kind, directory=directory)
+    except ScaffoldError as e:
+        print(f"init-policy: {e}", file=sys.stderr)
+        return 2
+    rel = os.path.relpath(pkg_dir)
+    print(f"created {rel}/ ({args.kind} policy)")
+    print("next:")
+    print(f"  minecombat-eval test-policy {spec}      # validate offline (no Minecraft)")
+    print(f"  minecombat-eval run-eval --policy {spec} # run against a live server")
+    return 0
+
+
+def cmd_test_policy(args: argparse.Namespace) -> int:
+    """Import a policy and run it on synthetic observations; no server needed."""
+    try:
+        agent_fn, before = load_policy_entry(args.policy)
+    except (ImportError, ValueError, TypeError, AttributeError) as e:
+        print(f"test-policy: could not load {args.policy!r}: {e}", file=sys.stderr)
+        return 2
+
+    if before is not None:
+        try:
+            before({"scenario_id": args.scenario, "seed": 0})
+        except Exception as e:  # noqa: BLE001 - report any user reset() failure
+            print(f"test-policy: reset() raised {type(e).__name__}: {e}", file=sys.stderr)
+            traceback.print_exc()
+            return 1
+
+    ran = 0
+    invalid_ticks: list[tuple[int, list[str]]] = []
+    samples: list[str] = []
+    for obs in approach_episode(args.ticks, scenario_id=args.scenario):
+        tick = obs["tick"]
+        try:
+            action = agent_fn(obs, tick)
+        except Exception as e:  # noqa: BLE001 - surface the policy's own error
+            print(f"test-policy: act() raised at tick {tick}: {type(e).__name__}: {e}", file=sys.stderr)
+            traceback.print_exc()
+            return 1
+        ran += 1
+        problems = validate_action(action)
+        if problems:
+            invalid_ticks.append((tick, problems))
+        if tick in (0, args.ticks // 2, args.ticks - 1):
+            samples.append(f"  tick {tick:>3}: {action}")
+
+    print(f"loaded {args.policy}")
+    print(f"ran act() on {ran} synthetic ticks (mob approaching player)")
+    if samples:
+        print("sample actions:")
+        print("\n".join(samples))
+    if invalid_ticks:
+        print(f"\nFAIL: {len(invalid_ticks)} tick(s) returned an invalid action:", file=sys.stderr)
+        for tick, problems in invalid_ticks[:5]:
+            print(f"  tick {tick}: {'; '.join(problems)}", file=sys.stderr)
+        return 1
+    print("\nOK: policy imports, runs, and returns valid actions.")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(
         prog="minecombat-eval",
@@ -189,6 +257,21 @@ def build_parser() -> argparse.ArgumentParser:
     rs.add_argument("--tags", default="")
     rs.add_argument("extra", nargs=argparse.REMAINDER)
     rs.set_defaults(func=cmd_run_suite)
+
+    ip = sub.add_parser("init-policy", help="Scaffold a custom policy package you can edit and run")
+    ip.add_argument("name", help="Package name (Python identifier, e.g. my_agent)")
+    ip.add_argument("--kind", choices=KINDS, default="conditional", help="Template (default: conditional)")
+    ip.add_argument("--dir", default=None, help="Parent directory for the package (default: cwd)")
+    ip.set_defaults(func=cmd_init_policy)
+
+    tp = sub.add_parser(
+        "test-policy",
+        help="Validate a policy on synthetic observations offline (no Minecraft needed)",
+    )
+    tp.add_argument("policy", help="module:Class or module:callable, e.g. my_agent.policy:MyAgentPolicy")
+    tp.add_argument("--ticks", type=int, default=60, help="Synthetic ticks to run (default: 60)")
+    tp.add_argument("--scenario", default="ZombieRoom-v0", help="scenario_id put in the fake observation")
+    tp.set_defaults(func=cmd_test_policy)
 
     sm = sub.add_parser("summarize", help="Summarize JSONL eval logs")
     sm.add_argument("inputs", nargs="+", type=Path)
