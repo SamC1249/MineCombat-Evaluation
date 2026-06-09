@@ -165,6 +165,11 @@ public final class EvaluationEngine {
         episode = Episode.begin(player, spec, layout, taskSpecApplied);
         clearHostiles(world, layout);
         world.setTime(spec.worldTime);
+        // A player killed in the previous episode is on the death screen; teleport/setHealth are
+        // no-ops until they respawn, so force it before repositioning for the new episode.
+        if (player.isDead()) {
+            player.spigot().respawn();
+        }
         Location ps = settings.playerSpawn(world, layout);
         player.teleport(ps);
         applyGear(player, spec);
