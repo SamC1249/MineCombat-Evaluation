@@ -1,0 +1,9 @@
+{
+  "entity": "SPIDER",
+  "time_of_day": "day",
+  "max_ticks": 2400,
+  "scenario_version": "1",
+  "gear": {
+    "weapon": "STONE_SWORD"
+  }
+}

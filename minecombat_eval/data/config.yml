@@ -1,0 +1,577 @@
+# TCP control plane (localhost only by default)
+network:
+  bind: "127.0.0.1"
+  port: 8765
+
+evaluation:
+  # If empty, the first online player is used (sorted by name).
+  player-name: ""
+  # Must match server.properties level-name (see server/server.properties.example).
+  world: "mcbench_flat"
+  # Default max ticks when a scenario omits max-ticks.
+  max-ticks: 2400
+
+  # Bounds for optional TCP reset field "task_spec" (merge overrides on a registered scenario_id).
+  # Open networks must not expose arbitrary task injection; keep bind=127.0.0.1.
+  task-spec:
+    # Hard cap for task_spec.max_ticks (separate from evaluation.max-ticks default for YAML scenarios).
+    max-ticks-cap: 12000
+    # When false, gear slots must use materials listed in allowed-gear-materials (Bukkit Material names).
+    allow-any-gear-material: true
+    allowed-gear-materials: []
+    # Extra EntityType names (UPPER_SNAKE) allowed for task_spec.entity; defaults include common Level-1 hostiles.
+    allowed-entities: []
+
+  arena:
+    # Mob-clearing box (same for all Level 1 scenarios; superflat — tune Y to your ground).
+    center-x: -39.0
+    center-y: -60.0
+    center-z: 12.0
+    half-size: 16
+    # Horizontal clear radius (blocks from center); use >= half-size to cull mobs just outside the arena.
+    # Omit or set <= 0 to default to max(half-size, 48).
+    mob-clear-half-size: 48
+    min-y-delta: 2
+    max-y-delta: 8
+
+  spawn:
+    player:
+      x: -39.0
+      y: -60.0
+      z: 12.0
+      yaw: 0.0
+      pitch: 0.0
+    zombie:
+      x: -31.0
+      y: -60.0
+      z: 12.0
+
+  move:
+    base-speed: 0.22
+    sprint-multiplier: 1.3
+
+  # Natural-spawn and border for the eval world; applied on plugin enable, config reload, and each reset.
+  # Level 2 custom-built arenas (unique spawn per environment).
+  environments:
+    cave:
+      spawn:
+        player: { x: -50.0, y: -58.0, z: 34.0, yaw: 0.0, pitch: 0.0 }
+        hostile: { x: -44.0, y: -58.0, z: 30.0 }
+      arena:
+        center-x: -47.0
+        center-y: -58.0
+        center-z: 32.0
+        half-size: 16
+        mob-clear-half-size: 48
+        min-y-delta: 6
+        max-y-delta: 10
+    beach:
+      spawn:
+        player: { x: -16.0, y: 61.0, z: 27.0, yaw: 0.0, pitch: 0.0 }
+        hostile: { x: -12.0, y: 61.0, z: 32.0 }
+      arena:
+        center-x: -14.0
+        center-y: 61.0
+        center-z: 29.5
+        half-size: 16
+        mob-clear-half-size: 48
+        min-y-delta: 4
+        max-y-delta: 8
+
+  isolation:
+    # If true, sets doMobSpawning = false (does not block plugin-issued spawns).
+    disable-natural-spawn: true
+    # Diameter in blocks, centered on evaluation.arena. 0 = do not change the world border.
+    world-border-diameter: 128
+    # If true, doDaylightCycle = false on the eval world so scenario time (e.g. night) does not tick away.
+    freeze-daylight-cycle: true
+    # If true, doMobGriefing = false plus event guards (creeper block damage, endermen, blaze fire, doors).
+    disable-mob-griefing: true
+
+  # Level 1: same superflat arena; vary gear, time-of-day, optional max-ticks.
+  # `entity` = Bukkit EntityType (e.g. ZOMBIE, CREEPER). `baby: true` only for ZOMBIE.
+  # For many mob/time/gear combos, use one row (e.g. ZombieRoom-v0) + TCP "task_spec" instead of new YAML keys.
+  # Level 2 (custom builds) is reserved — do not add level: 2 until environments exist.
+  scenarios:
+    ZombieRoom-v0:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: ZOMBIE
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-v0-creeper:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: CREEPER
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-v0-skeleton:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: SKELETON
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-v0-enderman:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: ENDERMAN
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-v0-spider:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: SPIDER
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-v0-baby-zombie:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: ZOMBIE
+      baby: true
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-v0-witch:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: WITCH
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-v0-magma-cube:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: MAGMA_CUBE
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-v0-slime:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: SLIME
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-v0-hoglin:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: HOGLIN
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-v0-silverfish:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: SILVERFISH
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-v0-blaze:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: BLAZE
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-v0-shulker:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      entity: SHULKER
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-L1-wood-night:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: night
+      gear:
+        weapon: WOODEN_SWORD
+
+    ZombieRoom-L1-stone-day:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      gear:
+        weapon: STONE_SWORD
+
+    ZombieRoom-L1-iron-leather-day:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      gear:
+        weapon: IRON_SWORD
+        helmet: LEATHER_HELMET
+        chestplate: LEATHER_CHESTPLATE
+        leggings: LEATHER_LEGGINGS
+        boots: LEATHER_BOOTS
+
+    ZombieRoom-L1-iron-full-day:
+      level: 1
+      scenario-version: "1"
+      max-ticks: 2400
+      time-of-day: day
+      gear:
+        weapon: IRON_SWORD
+        helmet: IRON_HELMET
+        chestplate: IRON_CHESTPLATE
+        leggings: IRON_LEGGINGS
+        boots: IRON_BOOTS
+
+    CaveRoom-v0:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: ZOMBIE
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-v0-creeper:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: CREEPER
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-v0-skeleton:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: SKELETON
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-v0-enderman:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: ENDERMAN
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-v0-spider:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: SPIDER
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-v0-baby-zombie:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: ZOMBIE
+      baby: true
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-v0-witch:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: WITCH
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-v0-magma-cube:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: MAGMA_CUBE
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-v0-slime:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: SLIME
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-v0-hoglin:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: HOGLIN
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-v0-silverfish:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: SILVERFISH
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-v0-blaze:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: BLAZE
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-v0-shulker:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: SHULKER
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-L1-wood-night:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: night
+      entity: ZOMBIE
+      gear:
+        weapon: WOODEN_SWORD
+    CaveRoom-L1-stone-day:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: ZOMBIE
+      gear:
+        weapon: STONE_SWORD
+    CaveRoom-L1-iron-leather-day:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: ZOMBIE
+      gear:
+        weapon: IRON_SWORD
+        helmet: LEATHER_HELMET
+        chestplate: LEATHER_CHESTPLATE
+        leggings: LEATHER_LEGGINGS
+        boots: LEATHER_BOOTS
+    CaveRoom-L1-iron-full-day:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: cave
+      time-of-day: day
+      entity: ZOMBIE
+      gear:
+        weapon: IRON_SWORD
+        helmet: IRON_HELMET
+        chestplate: IRON_CHESTPLATE
+        leggings: IRON_LEGGINGS
+        boots: IRON_BOOTS
+    BeachRoom-v0:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: ZOMBIE
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-v0-creeper:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: CREEPER
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-v0-skeleton:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: SKELETON
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-v0-enderman:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: ENDERMAN
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-v0-spider:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: SPIDER
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-v0-baby-zombie:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: ZOMBIE
+      baby: true
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-v0-witch:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: WITCH
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-v0-magma-cube:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: MAGMA_CUBE
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-v0-slime:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: SLIME
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-v0-hoglin:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: HOGLIN
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-v0-silverfish:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: SILVERFISH
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-v0-blaze:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: BLAZE
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-v0-shulker:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: SHULKER
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-L1-wood-night:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: night
+      entity: ZOMBIE
+      gear:
+        weapon: WOODEN_SWORD
+    BeachRoom-L1-stone-day:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: ZOMBIE
+      gear:
+        weapon: STONE_SWORD
+    BeachRoom-L1-iron-leather-day:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: ZOMBIE
+      gear:
+        weapon: IRON_SWORD
+        helmet: LEATHER_HELMET
+        chestplate: LEATHER_CHESTPLATE
+        leggings: LEATHER_LEGGINGS
+        boots: LEATHER_BOOTS
+    BeachRoom-L1-iron-full-day:
+      level: 2
+      scenario-version: "1"
+      max-ticks: 2400
+      environment: beach
+      time-of-day: day
+      entity: ZOMBIE
+      gear:
+        weapon: IRON_SWORD
+        helmet: IRON_HELMET
+        chestplate: IRON_CHESTPLATE
+        leggings: IRON_LEGGINGS
+        boots: IRON_BOOTS

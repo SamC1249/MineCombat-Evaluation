@@ -8,15 +8,30 @@ Paper plugin + TCP JSON protocol for combat-survival benchmarks on Minecraft **2
 
 **White paper:** [MineCombat-Evaluation: A Reproducible Minecraft Combat Benchmark for Agent Evaluation](paper/whitepaper.md)
 
-## Quick start
+## Quick start (PyPI, no repo needed)
+
+The wheel bundles the prebuilt plugin, world, config, and benchmark suites, and
+`server start` auto-downloads a Java 25 runtime — so a plain pip install is enough:
 
 ```bash
-cp .env.example .env          # JAVA_21, JAVA_25, SERVER
+pip install minecombat-eval
+minecombat-eval bootstrap        # downloads Paper + installs bundled plugin/world/config
+minecombat-eval server start     # auto-provisions a JRE, launches Paper
+# join localhost:25565 in your Minecraft client (use --offline at bootstrap for any client), then:
+minecombat-eval run-suite l1-v1 --policy my_agent.policy:MyPolicy -o results/l1-v1.jsonl
+```
+
+`bootstrap --offline` sets `online-mode=false` for frictionless local join.
+Paper itself is always downloaded on first bootstrap (it can't be redistributed).
+
+### From a repo checkout (maintainers / plugin dev)
+
+```bash
+cp .env.example .env          # JAVA_21 (build plugin), JAVA_25 (run Paper), SERVER
 python3 -m venv .venv && source .venv/bin/activate
-pip install -e .              # CLI + versioned world artifact (5.5 MB zip in package)
-minecombat-eval bootstrap     # Paper + plugin + mcbench_flat-v1 + config
-minecombat-eval server start  # join localhost, then:
-minecombat-eval run-suite l1-v1 -o results/l1-v1-ref.jsonl
+pip install -e .
+minecombat-eval bootstrap
+minecombat-eval server start
 ```
 
 **Docker:** `docker compose up --build` → join `:25565` → `minecombat-eval run-suite l1-v1 --port 8765`
@@ -101,7 +116,18 @@ python3 run_eval.py --scenario ZombieRoom-v0 --episodes 3 --seed-base 0
 python3 run_suite.py --suite benchmarks/l1-v1/suite.json -o results/l1-v1.jsonl
 ```
 
-Flags and scenario ids: **`planning/commands-and-scenarios.md`**. Custom policies: **`planning/agent-integration.md`**.
+Flags and scenario ids: **`planning/commands-and-scenarios.md`**.
+
+## Bring Your Own Agent
+
+Generate a starter policy package:
+
+```bash
+minecombat-eval init-policy my_agent --kind conditional
+minecombat-eval run-suite l1-v1 --policy my_agent.policy:MyPolicy
+```
+
+Policy integration guide: **`docs/policy-porting.md`**. Runnable examples: **`examples/custom_policy/`**.
 
 Official baseline: **`ReferenceCombatPolicy`** (`minecombat_eval/reference_policy.py`).
 

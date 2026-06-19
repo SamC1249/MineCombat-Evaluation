@@ -25,6 +25,23 @@ jobs:
         with:
           python-version: '3.11'
 
+      - name: Setup JDK 21 (plugin build)
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+
+      - name: Build plugin JAR
+        run: |
+          cd paper-plugin
+          chmod +x gradlew
+          ./gradlew jar --no-daemon
+
+      - name: Sync bundled package data (plugin JAR, config, suites)
+        run: |
+          chmod +x scripts/sync-package-data.sh
+          ./scripts/sync-package-data.sh
+
       - name: Build wheel and sdist
         run: |
           python -m pip install --upgrade pip build

@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "minecombat-eval"
-version = "0.2.0"
+version = "0.3.0"
 description = "TCP client and bootstrap tooling for MineCombat-Evaluation (Minecraft combat benchmarks)"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -36,4 +36,8 @@ where = ["."]
 include = ["minecombat_eval*"]
 
 [tool.setuptools.package-data]
-minecombat_eval = ["data/*"]
+minecombat_eval = [
+    "data/*",
+    "data/plugin/*.jar",
+    "data/benchmarks/**/*.json",
+]

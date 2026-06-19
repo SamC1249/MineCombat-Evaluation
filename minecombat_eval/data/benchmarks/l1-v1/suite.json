@@ -1,0 +1,406 @@
+{
+  "suite_id": "l1-v1",
+  "suite_version": "1",
+  "description": "Level 1 task_spec grid: 6 mobs \u00d7 3 gear tiers \u00d7 day/night on the template arena. Base scenario ZombieRoom-v0; overrides via task_spec.",
+  "default_scenario_id": "ZombieRoom-v0",
+  "episodes_per_task": 1,
+  "seed_base": 0,
+  "tasks": [
+    {
+      "task_id": "zombie_wood_day",
+      "skill_family": "baseline_melee",
+      "tags": [
+        "core",
+        "gear_wood",
+        "time_day",
+        "mob_zombie"
+      ],
+      "task_spec_file": "tasks/zombie_wood_day.json"
+    },
+    {
+      "task_id": "zombie_wood_night",
+      "skill_family": "baseline_melee",
+      "tags": [
+        "core",
+        "gear_wood",
+        "time_night",
+        "mob_zombie"
+      ],
+      "task_spec_file": "tasks/zombie_wood_night.json"
+    },
+    {
+      "task_id": "zombie_stone_day",
+      "skill_family": "baseline_melee",
+      "tags": [
+        "core",
+        "gear_stone",
+        "time_day",
+        "mob_zombie"
+      ],
+      "task_spec_file": "tasks/zombie_stone_day.json"
+    },
+    {
+      "task_id": "zombie_stone_night",
+      "skill_family": "baseline_melee",
+      "tags": [
+        "core",
+        "gear_stone",
+        "time_night",
+        "mob_zombie"
+      ],
+      "task_spec_file": "tasks/zombie_stone_night.json"
+    },
+    {
+      "task_id": "zombie_iron_full_day",
+      "skill_family": "baseline_melee",
+      "tags": [
+        "core",
+        "gear_iron_full",
+        "time_day",
+        "mob_zombie"
+      ],
+      "task_spec_file": "tasks/zombie_iron_full_day.json"
+    },
+    {
+      "task_id": "zombie_iron_full_night",
+      "skill_family": "baseline_melee",
+      "tags": [
+        "core",
+        "gear_iron_full",
+        "time_night",
+        "mob_zombie"
+      ],
+      "task_spec_file": "tasks/zombie_iron_full_night.json"
+    },
+    {
+      "task_id": "creeper_wood_day",
+      "skill_family": "explosion_pressure",
+      "tags": [
+        "core",
+        "gear_wood",
+        "time_day",
+        "mob_creeper"
+      ],
+      "task_spec_file": "tasks/creeper_wood_day.json"
+    },
+    {
+      "task_id": "creeper_wood_night",
+      "skill_family": "explosion_pressure",
+      "tags": [
+        "core",
+        "gear_wood",
+        "time_night",
+        "mob_creeper"
+      ],
+      "task_spec_file": "tasks/creeper_wood_night.json"
+    },
+    {
+      "task_id": "creeper_stone_day",
+      "skill_family": "explosion_pressure",
+      "tags": [
+        "core",
+        "gear_stone",
+        "time_day",
+        "mob_creeper"
+      ],
+      "task_spec_file": "tasks/creeper_stone_day.json"
+    },
+    {
+      "task_id": "creeper_stone_night",
+      "skill_family": "explosion_pressure",
+      "tags": [
+        "core",
+        "gear_stone",
+        "time_night",
+        "mob_creeper"
+      ],
+      "task_spec_file": "tasks/creeper_stone_night.json"
+    },
+    {
+      "task_id": "creeper_iron_full_day",
+      "skill_family": "explosion_pressure",
+      "tags": [
+        "core",
+        "gear_iron_full",
+        "time_day",
+        "mob_creeper"
+      ],
+      "task_spec_file": "tasks/creeper_iron_full_day.json"
+    },
+    {
+      "task_id": "creeper_iron_full_night",
+      "skill_family": "explosion_pressure",
+      "tags": [
+        "core",
+        "gear_iron_full",
+        "time_night",
+        "mob_creeper"
+      ],
+      "task_spec_file": "tasks/creeper_iron_full_night.json"
+    },
+    {
+      "task_id": "skeleton_wood_day",
+      "skill_family": "ranged_kiting",
+      "tags": [
+        "core",
+        "gear_wood",
+        "time_day",
+        "mob_skeleton"
+      ],
+      "task_spec_file": "tasks/skeleton_wood_day.json"
+    },
+    {
+      "task_id": "skeleton_wood_night",
+      "skill_family": "ranged_kiting",
+      "tags": [
+        "core",
+        "gear_wood",
+        "time_night",
+        "mob_skeleton"
+      ],
+      "task_spec_file": "tasks/skeleton_wood_night.json"
+    },
+    {
+      "task_id": "skeleton_stone_day",
+      "skill_family": "ranged_kiting",
+      "tags": [
+        "core",
+        "gear_stone",
+        "time_day",
+        "mob_skeleton"
+      ],
+      "task_spec_file": "tasks/skeleton_stone_day.json"
+    },
+    {
+      "task_id": "skeleton_stone_night",
+      "skill_family": "ranged_kiting",
+      "tags": [
+        "core",
+        "gear_stone",
+        "time_night",
+        "mob_skeleton"
+      ],
+      "task_spec_file": "tasks/skeleton_stone_night.json"
+    },
+    {
+      "task_id": "skeleton_iron_full_day",
+      "skill_family": "ranged_kiting",
+      "tags": [
+        "core",
+        "gear_iron_full",
+        "time_day",
+        "mob_skeleton"
+      ],
+      "task_spec_file": "tasks/skeleton_iron_full_day.json"
+    },
+    {
+      "task_id": "skeleton_iron_full_night",
+      "skill_family": "ranged_kiting",
+      "tags": [
+        "core",
+        "gear_iron_full",
+        "time_night",
+        "mob_skeleton"
+      ],
+      "task_spec_file": "tasks/skeleton_iron_full_night.json"
+    },
+    {
+      "task_id": "spider_wood_day",
+      "skill_family": "fast_melee",
+      "tags": [
+        "core",
+        "gear_wood",
+        "time_day",
+        "mob_spider"
+      ],
+      "task_spec_file": "tasks/spider_wood_day.json"
+    },
+    {
+      "task_id": "spider_wood_night",
+      "skill_family": "fast_melee",
+      "tags": [
+        "core",
+        "gear_wood",
+        "time_night",
+        "mob_spider"
+      ],
+      "task_spec_file": "tasks/spider_wood_night.json"
+    },
+    {
+      "task_id": "spider_stone_day",
+      "skill_family": "fast_melee",
+      "tags": [
+        "core",
+        "gear_stone",
+        "time_day",
+        "mob_spider"
+      ],
+      "task_spec_file": "tasks/spider_stone_day.json"
+    },
+    {
+      "task_id": "spider_stone_night",
+      "skill_family": "fast_melee",
+      "tags": [
+        "core",
+        "gear_stone",
+        "time_night",
+        "mob_spider"
+      ],
+      "task_spec_file": "tasks/spider_stone_night.json"
+    },
+    {
+      "task_id": "spider_iron_full_day",
+      "skill_family": "fast_melee",
+      "tags": [
+        "core",
+        "gear_iron_full",
+        "time_day",
+        "mob_spider"
+      ],
+      "task_spec_file": "tasks/spider_iron_full_day.json"
+    },
+    {
+      "task_id": "spider_iron_full_night",
+      "skill_family": "fast_melee",
+      "tags": [
+        "core",
+        "gear_iron_full",
+        "time_night",
+        "mob_spider"
+      ],
+      "task_spec_file": "tasks/spider_iron_full_night.json"
+    },
+    {
+      "task_id": "enderman_wood_day",
+      "skill_family": "teleport_melee",
+      "tags": [
+        "core",
+        "gear_wood",
+        "time_day",
+        "mob_enderman"
+      ],
+      "task_spec_file": "tasks/enderman_wood_day.json"
+    },
+    {
+      "task_id": "enderman_wood_night",
+      "skill_family": "teleport_melee",
+      "tags": [
+        "core",
+        "gear_wood",
+        "time_night",
+        "mob_enderman"
+      ],
+      "task_spec_file": "tasks/enderman_wood_night.json"
+    },
+    {
+      "task_id": "enderman_stone_day",
+      "skill_family": "teleport_melee",
+      "tags": [
+        "core",
+        "gear_stone",
+        "time_day",
+        "mob_enderman"
+      ],
+      "task_spec_file": "tasks/enderman_stone_day.json"
+    },
+    {
+      "task_id": "enderman_stone_night",
+      "skill_family": "teleport_melee",
+      "tags": [
+        "core",
+        "gear_stone",
+        "time_night",
+        "mob_enderman"
+      ],
+      "task_spec_file": "tasks/enderman_stone_night.json"
+    },
+    {
+      "task_id": "enderman_iron_full_day",
+      "skill_family": "teleport_melee",
+      "tags": [
+        "core",
+        "gear_iron_full",
+        "time_day",
+        "mob_enderman"
+      ],
+      "task_spec_file": "tasks/enderman_iron_full_day.json"
+    },
+    {
+      "task_id": "enderman_iron_full_night",
+      "skill_family": "teleport_melee",
+      "tags": [
+        "core",
+        "gear_iron_full",
+        "time_night",
+        "mob_enderman"
+      ],
+      "task_spec_file": "tasks/enderman_iron_full_night.json"
+    },
+    {
+      "task_id": "witch_wood_day",
+      "skill_family": "potion_ranged",
+      "tags": [
+        "core",
+        "gear_wood",
+        "time_day",
+        "mob_witch"
+      ],
+      "task_spec_file": "tasks/witch_wood_day.json"
+    },
+    {
+      "task_id": "witch_wood_night",
+      "skill_family": "potion_ranged",
+      "tags": [
+        "core",
+        "gear_wood",
+        "time_night",
+        "mob_witch"
+      ],
+      "task_spec_file": "tasks/witch_wood_night.json"
+    },
+    {
+      "task_id": "witch_stone_day",
+      "skill_family": "potion_ranged",
+      "tags": [
+        "core",
+        "gear_stone",
+        "time_day",
+        "mob_witch"
+      ],
+      "task_spec_file": "tasks/witch_stone_day.json"
+    },
+    {
+      "task_id": "witch_stone_night",
+      "skill_family": "potion_ranged",
+      "tags": [
+        "core",
+        "gear_stone",
+        "time_night",
+        "mob_witch"
+      ],
+      "task_spec_file": "tasks/witch_stone_night.json"
+    },
+    {
+      "task_id": "witch_iron_full_day",
+      "skill_family": "potion_ranged",
+      "tags": [
+        "core",
+        "gear_iron_full",
+        "time_day",
+        "mob_witch"
+      ],
+      "task_spec_file": "tasks/witch_iron_full_day.json"
+    },
+    {
+      "task_id": "witch_iron_full_night",
+      "skill_family": "potion_ranged",
+      "tags": [
+        "core",
+        "gear_iron_full",
+        "time_night",
+        "mob_witch"
+      ],
+      "task_spec_file": "tasks/witch_iron_full_night.json"
+    }
+  ]
+}
