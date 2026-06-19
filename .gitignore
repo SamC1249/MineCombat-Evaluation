@@ -58,3 +58,4 @@ server/plugins/MineCombat-Evaluation/config.yml
 
 # Cursor / editor local state (optional)
 .cursor/
+.claude/

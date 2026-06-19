@@ -30,6 +30,28 @@ def data_dir() -> Path:
     return Path(__file__).resolve().parent / "data"
 
 
+def bundled_plugin_jar() -> Path | None:
+    """Prebuilt plugin JAR shipped in the wheel (data/plugin/*.jar), if present."""
+    jar_name = load_manifest().get("plugin_jar", "")
+    candidate = data_dir() / "plugin" / jar_name if jar_name else None
+    if candidate and candidate.is_file():
+        return candidate
+    jars = sorted((data_dir() / "plugin").glob("*.jar")) if (data_dir() / "plugin").is_dir() else []
+    return jars[0] if jars else None
+
+
+def bundled_config() -> Path | None:
+    """Plugin config.yml shipped in the wheel (data/config.yml), if present."""
+    candidate = data_dir() / "config.yml"
+    return candidate if candidate.is_file() else None
+
+
+def bundled_suite_path(name: str) -> Path | None:
+    """Resolve a suite id (e.g. ``l1-v1``) to a bundled suite.json, if present."""
+    candidate = data_dir() / "benchmarks" / name / "suite.json"
+    return candidate if candidate.is_file() else None
+
+
 def load_manifest() -> dict[str, Any]:
     packaged = data_dir() / "manifest.json"
     if packaged.is_file():
@@ -84,6 +106,18 @@ def _java_home(version: str) -> Path:
 
 def build_plugin(*, skip: bool = False) -> Path:
     root = repo_root()
+    has_source = (root / "paper-plugin").is_dir()
+
+    # Pure pip install (no repo source): use the prebuilt JAR bundled in the wheel.
+    # No repo, no JDK 21 build needed.
+    if not has_source:
+        bundled = bundled_plugin_jar()
+        if bundled is not None:
+            return bundled
+        raise BootstrapError(
+            "no plugin source and no bundled JAR found (reinstall the package)"
+        )
+
     jar_name = load_manifest().get("plugin_jar", "minecombat-evaluation-0.1.0-SNAPSHOT.jar")
     jar_path = root / "paper-plugin" / "build" / "libs" / jar_name
     if skip and jar_path.is_file():
@@ -168,10 +202,11 @@ def install_plugin(server: Path, plugin_jar: Path) -> None:
 
 
 def sync_config(server: Path) -> None:
-    root = repo_root()
-    src = root / "paper-plugin" / "src" / "main" / "resources" / "config.yml"
-    if not src.is_file():
-        raise BootstrapError(f"missing config template: {src}")
+    # Prefer the repo source of truth when present; fall back to the bundled copy.
+    repo_src = repo_root() / "paper-plugin" / "src" / "main" / "resources" / "config.yml"
+    src = repo_src if repo_src.is_file() else bundled_config()
+    if src is None or not src.is_file():
+        raise BootstrapError(f"missing config template: {repo_src}")
     dest_dir = server / "plugins" / "MineCombat-Evaluation"
     dest_dir.mkdir(parents=True, exist_ok=True)
     dest = dest_dir / "config.yml"
@@ -190,13 +225,17 @@ def write_eula(server: Path) -> None:
     print(f"Wrote {path}")
 
 
-def write_server_properties(server: Path, manifest: dict[str, Any]) -> None:
+def write_server_properties(server: Path, manifest: dict[str, Any], *, online_mode: bool = True) -> None:
     level = manifest["world"]["level_name"]
     path = server / "server.properties"
     lines: list[str] = []
     if path.is_file():
         lines = path.read_text(encoding="utf-8").splitlines()
-    keys = {"level-name": level, "level-type": "minecraft:flat", "online-mode": "true"}
+    keys = {
+        "level-name": level,
+        "level-type": "minecraft:flat",
+        "online-mode": "true" if online_mode else "false",
+    }
     out: dict[str, str] = {}
     seen: set[str] = set()
     for line in lines:
@@ -225,6 +264,7 @@ def bootstrap(
     skip_world: bool = False,
     force_world: bool = False,
     force_paper: bool = False,
+    online_mode: bool = True,
 ) -> Path:
     manifest = load_manifest()
     srv = resolve_server(server)
@@ -234,7 +274,7 @@ def bootstrap(
     if not skip_paper:
         install_paper(srv, manifest, force=force_paper)
     write_eula(srv)
-    write_server_properties(srv, manifest)
+    write_server_properties(srv, manifest, online_mode=online_mode)
 
     plugin_jar = build_plugin(skip=skip_build)
     install_plugin(srv, plugin_jar)
@@ -243,11 +283,49 @@ def bootstrap(
     if not skip_world:
         install_world(srv, manifest, force=force_world)
 
-    print("\nDone. Start Paper (restart if already running):")
-    print(f"  SERVER={srv} ./scripts/run-paper.sh")
-    print("  or: minecombat-eval server start")
-    print("\nJoin Minecraft localhost once, then run eval / your agent.")
+    print("\nDone. Start Paper:")
+    print("  minecombat-eval server start")
+    print("\nThen join the world once in your Minecraft client, and run your agent.")
     return srv
+
+
+def start_server(
+    *,
+    server: str | None = None,
+    java_version: int = 25,
+    allow_download: bool = True,
+    memory: str = "2G",
+) -> int:
+    """Launch Paper from the server dir using an auto-located/downloaded JRE.
+
+    Replaces scripts/run-paper.sh so a pure pip install can run the server.
+    """
+    from .java import JavaError, ensure_java
+
+    srv = resolve_server(server)
+    jar = srv / "paper.jar"
+    if not jar.is_file():
+        raise BootstrapError(f"missing {jar}; run `minecombat-eval bootstrap` first")
+    try:
+        java_bin = ensure_java(java_version, allow_download=allow_download)
+    except JavaError as e:
+        raise BootstrapError(str(e)) from e
+
+    online = "true"
+    props = srv / "server.properties"
+    if props.is_file():
+        for line in props.read_text(encoding="utf-8").splitlines():
+            if line.strip().startswith("online-mode="):
+                online = line.split("=", 1)[1].strip()
+
+    print(f"Java: {java_bin}")
+    print(f"Server: {srv}")
+    print("Starting Paper … once it says 'Done', join your Minecraft client:")
+    print("  Multiplayer -> Direct Connect -> localhost:25565"
+          + ("" if online == "true" else "  (online-mode=false: any client allowed)"))
+    print("Agent connects on TCP 8765. Stop the server with Ctrl-C or the `stop` console command.")
+    cmd = [str(java_bin), f"-Xms{memory}", f"-Xmx{memory}", "-jar", "paper.jar", "--nogui"]
+    return subprocess.call(cmd, cwd=str(srv))
 
 
 def export_world(
